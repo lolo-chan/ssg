@@ -19,6 +19,8 @@ def split_nodes_delimiter(old_nodes: list[TextNode], delimiter: str, text_type: 
                         else:
                             new_nodes.append(TextNode(node, text_type))
                     odd = not odd
+            else:
+                new_nodes.append(i)
     return new_nodes
 
 
@@ -43,31 +45,79 @@ def extract_markdown_links(text):
 def split_nodes_image(old_nodes: list[TextNode]) -> list[TextNode]:
     new_nodes = []
     for node in old_nodes:
-        images = extract_markdown_images(node.text)
-        text = node.text
-        for i in images:
-            sections = text.split(f"![{i[0]}]({i[1]})", 1)
-            if sections[0] != '':
-                new_nodes.append(TextNode(sections[0], TextType.TEXT))
-            new_nodes.append(TextNode(i[0], TextType.IMAGE, i[1]))
-            text = sections[1]
-        if text:
-            new_nodes.append(TextNode(text, TextType.TEXT))
+        if node.text_type == TextType.TEXT:
+            images = extract_markdown_images(node.text)
+            text = node.text
+            for i in images:
+                sections = text.split(f"![{i[0]}]({i[1]})", 1)
+                if sections[0] != '':
+                    new_nodes.append(TextNode(sections[0], TextType.TEXT))
+                new_nodes.append(TextNode(i[0], TextType.IMAGE, i[1]))
+                text = sections[1]
+            if text:
+                new_nodes.append(TextNode(text, TextType.TEXT))
+        else:
+            new_nodes.append(node)
     return new_nodes
 
 
 def split_nodes_link(old_nodes: list[TextNode]) -> list[TextNode]:
     new_nodes = []
     for node in old_nodes:
-        images = extract_markdown_links(node.text)
-        text = node.text
-        for i in images:
-            sections = text.split(f"[{i[0]}]({i[1]})", 1)
-            if sections[0] != '':
-                new_nodes.append(TextNode(sections[0], TextType.TEXT))
-            new_nodes.append(TextNode(i[0], TextType.LINK, i[1]))
-            text = sections[1]
-        if text:
-            new_nodes.append(TextNode(text, TextType.TEXT))
+        if node.text_type == TextType.TEXT:
+            images = extract_markdown_links(node.text)
+            text = node.text
+            for i in images:
+                sections = text.split(f"[{i[0]}]({i[1]})", 1)
+                if sections[0] != '':
+                    new_nodes.append(TextNode(sections[0], TextType.TEXT))
+                new_nodes.append(TextNode(i[0], TextType.LINK, i[1]))
+                text = sections[1]
+            if text:
+                new_nodes.append(TextNode(text, TextType.TEXT))
+        else:
+            new_nodes.append(node)
     return new_nodes
+
+
+def text_to_textnodes(text):
+    nodes = [TextNode(text, TextType.TEXT)]
+
+    nodes = split_nodes_delimiter(nodes, '**', TextType.BOLD)
+    nodes = split_nodes_delimiter(nodes, '_', TextType.ITALIC)
+    nodes = split_nodes_delimiter(nodes, '`', TextType.CODE)
+    nodes = split_nodes_image(nodes)
+    nodes = split_nodes_link(nodes)
+    return nodes
+
+
+def markdown_to_blocks(markdown):
+    result = []
+    blocks = markdown.split('\n\n')
+    for block in blocks:
+        clean_block = block.strip()
+        if clean_block.startswith('\n'):
+            clean_block = clean_block[2:]
+        if clean_block.endswith('\n'):
+            clean_block = clean_block[:-2]
+        if '\n' in clean_block:
+            dedent_block = []
+            split_block = clean_block.split('\n')
+            for i in split_block:
+                dedent_block.append(i.strip())
+            clean_block = '\n'.join(dedent_block)
+        if len(clean_block) > 0:
+            result.append(clean_block)
+    return result
+
+markdown = """
+            This is **bolded** paragraph
+
+            This is another paragraph with _italic_ text and `code` here
+            This is the same paragraph on a new line
+
+            - This is a list
+            - with items
+            """
+print(markdown_to_blocks(markdown))
 
