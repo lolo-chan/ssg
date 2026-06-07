@@ -109,4 +109,3 @@ def markdown_to_blocks(markdown):
         if len(clean_block) > 0:
             result.append(clean_block)
     return result
-
