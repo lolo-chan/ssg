@@ -43,8 +43,6 @@ def strip_markdown_syntax(text: str, block_type: BlockType) -> str:
             text = text[3:-3]
             if text.startswith('\n'):
                 text = text[1:]
-            # if text.endswith('\n'):
-                # text = text[:-1]
             return text
         case(BlockType.QUOTE):
             lines = text.split('\n')
