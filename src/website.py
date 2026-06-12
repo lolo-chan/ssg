@@ -25,7 +25,7 @@ def extract_title(markdown: str) -> str:
     raise Exception("no header!")
 
 
-def generate_page(from_path, template_path, dest_path, basepath):
+def generate_page(from_path, template_path, dest_path, basepath='/'):
     print(f"Generating page from {from_path} to {dest_path} using {template_path}")
 
     with open(f"{from_path}/index.md", encoding="utf-8") as f:
