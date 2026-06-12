@@ -55,13 +55,5 @@ def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
             generate_page(dir_path_content, template_path, dest_dir_path)
         if os.path.isdir(os.path.join(dir_path_content, i)):
             if not os.path.isdir(os.path.join(dest_dir_path, i)):
-                # if '/' in dir_path_content:
-                #     print(f"Creating: {os.path.join(dest_dir_path, dir_path_content.split('/',1)[1], i)}")
-                #     os.mkdir(os.path.join(dest_dir_path, dir_path_content.split('/',1)[1], i))
-                # else:
-                #     print(f"Creating: {os.path.join(dest_dir_path, i)}")
                 os.mkdir(os.path.join(dest_dir_path, i))
             generate_pages_recursive(os.path.join(dir_path_content, i), template_path, os.path.join(dest_dir_path, i))
-    
-
-# generate_pages_recursive("content", "template.html", "public")
